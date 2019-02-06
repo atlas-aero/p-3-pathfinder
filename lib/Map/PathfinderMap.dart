@@ -11,6 +11,12 @@ class PathfinderMap
     this.setSegments(segments);
   }
 
+  Segment getCenter()
+  {
+    int position = (_segments.length / 2).floor();
+    return _segments[position][position];
+  }
+
   void setSegments(List<Segment> segments)
   {
     int dimensionSize = sqrt(segments.length).floor();
@@ -25,7 +31,7 @@ class PathfinderMap
 
 
     _segments = new List(dimensionSize);
-    for (int i = 0; i <= dimensionSize; i++) {
+    for (int i = 0; i < dimensionSize; i++) {
       _segments[i] = new List(dimensionSize);
     }
 
