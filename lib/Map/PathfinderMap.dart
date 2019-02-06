@@ -36,6 +36,23 @@ class PathfinderMap
     return result;
   }
 
+  List<Segment> getNeighbours(Segment segment)
+  {
+    List<Segment> result = new List();
+
+    _addSegmentIfExists(segment.position.x, segment.position.y - 1, result);
+    _addSegmentIfExists(segment.position.x, segment.position.y + 1, result);
+    _addSegmentIfExists(segment.position.x + 1, segment.position.y, result);
+    _addSegmentIfExists(segment.position.x - 1, segment.position.y, result);
+
+    _addSegmentIfExists(segment.position.x - 1, segment.position.y - 1, result);
+    _addSegmentIfExists(segment.position.x - 1, segment.position.y + 1, result);
+    _addSegmentIfExists(segment.position.x + 1, segment.position.y + 1, result);
+    _addSegmentIfExists(segment.position.x + 1, segment.position.y - 1, result);
+
+    return result;
+  }
+
   void setSegments(List<Segment> segments)
   {
     int dimensionSize = sqrt(segments.length).floor();
@@ -56,6 +73,16 @@ class PathfinderMap
 
     for(Segment segment in segments) {
       _segments[segment.position.x][segment.position.y] = segment;
+    }
+  }
+
+  void _addSegmentIfExists(int x, int y, List<Segment> list)
+  {
+    int dimensionSize = _segments.length;
+
+    if (x < dimensionSize && x >= 0
+        && y < dimensionSize && y >= 0) {
+      list.add(_segments[x][y]);
     }
   }
 }
