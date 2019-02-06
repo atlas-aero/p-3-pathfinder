@@ -17,6 +17,25 @@ class PathfinderMap
     return _segments[position][position];
   }
 
+  List<Segment> getCenterRing(int offset)
+  {
+    List<Segment> result = new List();
+    Position center = getCenter().position;
+
+    for (int i = 0 - offset; i <= offset; i++) {
+      result.add(_segments[center.x - offset][center.y - i]);
+      result.add(_segments[center.x + offset][center.y - i]);
+    }
+
+    offset--;
+    for (int i = 0 - offset; i <= offset; i++) {
+      result.add(_segments[center.x - i][center.y - offset]);
+      result.add(_segments[center.x - i][center.y + offset]);
+    }
+
+    return result;
+  }
+
   void setSegments(List<Segment> segments)
   {
     int dimensionSize = sqrt(segments.length).floor();

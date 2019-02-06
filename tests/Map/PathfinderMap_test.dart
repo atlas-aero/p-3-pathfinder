@@ -48,4 +48,33 @@ void main() {
     expect(center.position.y, 2);
   });
 
+  test("correct center ring", () {
+    List<Segment> segments = new List();
+    for (int x = 0; x < 9; x++) {
+      for (int y = 0; y < 9; y++) {
+        segments.add(new Segment(new Position(x, y), new Point(1, 2), new Point(3, 4), 100.0));
+      }
+    }
+    
+    PathfinderMap map = new PathfinderMap(segments);
+    List<Segment> ring = map.getCenterRing(3);
+    
+    Map<String, Segment> sortedRing =  new Map();
+    for(Segment segment in ring) {
+      String key = segment.position.x.toString() + '|' + segment.position.y.toString();
+      sortedRing[key] = segment;
+    }
+    
+    List<Position> expectedPositions = [
+      new Position(1, 1), new Position(1, 2), new Position(1, 3), new Position(1, 4), new Position(1, 5), new Position(1, 6), new Position(1, 7),
+      new Position(7, 1), new Position(7, 2), new Position(7, 3), new Position(7, 4), new Position(7, 5), new Position(7, 6), new Position(7, 7),
+      new Position(1, 2), new Position(1, 3), new Position(1, 4), new Position(1, 5), new Position(1, 6),
+      new Position(7, 2), new Position(7, 3), new Position(7, 4), new Position(7, 5), new Position(7, 6),
+    ];
+
+    for(Position expectedPosition in expectedPositions) {
+      String key = expectedPosition.x.toString() + '|' + expectedPosition.y.toString();
+      expect(sortedRing.containsKey(key), equals(true), reason: "Expected positon " + key + " not found");
+    }
+  });
 }
