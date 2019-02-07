@@ -136,4 +136,16 @@ void main() {
       expect(sortedRing.containsKey(key), equals(true), reason: "Expected positon " + key + " not found");
     }
   });
+
+  test("correct ring count", () {
+    List<Segment> segments = new List();
+    for (int y = 0; y < 5; y++) {
+      for (int x = 0; x < 5; x++) {
+        segments.add(new Segment(new Position(x, y), new Point(1, 2), new Point(3, 4), 100.0));
+      }
+    }
+
+    PathfinderMap map = new PathfinderMap(segments);
+    expect(map.ringCount, equals(2));
+  });
 }

@@ -76,6 +76,11 @@ class PathfinderMap
     }
   }
 
+  int get ringCount
+  {
+    return ((_segments.length - 1) / 2).floor();
+  }
+
   void _addSegmentIfExists(int x, int y, List<Segment> list)
   {
     int dimensionSize = _segments.length;
