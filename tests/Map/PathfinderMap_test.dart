@@ -68,8 +68,8 @@ void main() {
     List<Position> expectedPositions = [
       new Position(1, 1), new Position(1, 2), new Position(1, 3), new Position(1, 4), new Position(1, 5), new Position(1, 6), new Position(1, 7),
       new Position(7, 1), new Position(7, 2), new Position(7, 3), new Position(7, 4), new Position(7, 5), new Position(7, 6), new Position(7, 7),
-      new Position(1, 2), new Position(1, 3), new Position(1, 4), new Position(1, 5), new Position(1, 6),
-      new Position(7, 2), new Position(7, 3), new Position(7, 4), new Position(7, 5), new Position(7, 6),
+      new Position(2, 1), new Position(3, 1), new Position(4, 1), new Position(5, 1), new Position(6, 1),
+      new Position(2, 7), new Position(3, 7), new Position(4, 7), new Position(5, 7), new Position(6, 7),
     ];
 
     for(Position expectedPosition in expectedPositions) {

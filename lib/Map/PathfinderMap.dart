@@ -27,8 +27,7 @@ class PathfinderMap
       result.add(_segments[center.x + offset][center.y - i]);
     }
 
-    offset--;
-    for (int i = 0 - offset; i <= offset; i++) {
+    for (int i = 0 - (offset - 1); i <= (offset - 1); i++) {
       result.add(_segments[center.x - i][center.y - offset]);
       result.add(_segments[center.x - i][center.y + offset]);
     }
