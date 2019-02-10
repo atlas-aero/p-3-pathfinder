@@ -1,18 +1,25 @@
+import 'package:p3pathfinder/Calculation/SnapshotSubscriber.dart';
 import 'package:p3pathfinder/Map/PathfinderMap.dart';
 import 'package:p3pathfinder/Map/Segment.dart';
 
 class Pathfinder
 {
   final PathfinderMap map;
+  final SnapshotSubscriber subscriber;
+  
   final double minAltitude;
   final double glideAngle;
 
-  Pathfinder(this.map, this.minAltitude, this.glideAngle);
+  Pathfinder(this.map, {this.subscriber = null, this.minAltitude = 40.0, this.glideAngle = 9.0});
 
   void process(double centerAltitude)
   {
     map.getCenter().absoluteAltitude = centerAltitude;
     bool segmentChanged = true;
+
+    if (subscriber != null) {
+      subscriber.onStarted(map);
+    }
 
     do {
       segmentChanged = _iterate();
@@ -52,10 +59,18 @@ class Pathfinder
 
       if (newAbsAltitude > segment.absoluteAltitude) {
         segment.absoluteAltitude = newAbsAltitude;
+        _snapshot(segment);
         segmentChanged = true;
       }
     }
 
     return segmentChanged;
+  }
+
+  void _snapshot(Segment segment)
+  {
+    if (subscriber != null) {
+      subscriber.onSegmentChanged(segment);
+    }
   }
 }

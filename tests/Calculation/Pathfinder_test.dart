@@ -1,18 +1,20 @@
 import 'dart:math';
 
 import 'package:p3pathfinder/Calculation/Pathfinder.dart';
+import 'package:p3pathfinder/Calculation/SnapshotSubscriber.dart';
 import 'package:p3pathfinder/Map/PathfinderMap.dart';
 import 'package:p3pathfinder/Map/Segment.dart';
 import "package:test/test.dart";
 import 'package:mockito/mockito.dart';
 
 class MapMock extends Mock implements PathfinderMap {}
+class SnapshotSubscriberMock extends Mock implements SnapshotSubscriber {}
 
 void main()
 {
   test("correct altitude calculated for horizontal path", () {
     MapMock map = new MapMock();
-    Pathfinder pathfinder = new Pathfinder(map, 40.0, 9.0);
+    Pathfinder pathfinder = new Pathfinder(map, minAltitude: 40.0, glideAngle: 9.0);
 
     Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 0.0);
     Segment ringSegment = new Segment(new Position(1, 2), new Point(3.0, 5.0), new Point(5.0, 7.0), 0.0);
@@ -29,7 +31,7 @@ void main()
 
   test("correct altitude calculated for diagonal path", () {
     MapMock map = new MapMock();
-    Pathfinder pathfinder = new Pathfinder(map, 40.0, 9.0);
+    Pathfinder pathfinder = new Pathfinder(map, minAltitude: 40.0, glideAngle: 9.0);
 
     Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 0.0);
     Segment ringSegment = new Segment(new Position(1, 3), new Point(3.0, 7.0), new Point(5.0, 9.0), 0.0);
@@ -46,7 +48,7 @@ void main()
 
   test("not updated if below min altitude", () {
     MapMock map = new MapMock();
-    Pathfinder pathfinder = new Pathfinder(map, 40.0, 9.0);
+    Pathfinder pathfinder = new Pathfinder(map, minAltitude: 40.0, glideAngle: 9.0);
 
     Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 470.0);
     Segment ringSegment = new Segment(new Position(1, 2), new Point(3.0, 5.0), new Point(5.0, 7.0), 0.0);
@@ -63,7 +65,7 @@ void main()
 
   test("alwas best path (highest abs altitude) choosen", () {
     MapMock map = new MapMock();
-    Pathfinder pathfinder = new Pathfinder(map, 40.0, 9.0);
+    Pathfinder pathfinder = new Pathfinder(map, minAltitude: 40.0, glideAngle: 9.0);
 
     Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 0.0);
     Segment otherNeighbour = new Segment(new Position(2, 3), new Point(5.0, 7.0), new Point(7.0, 9.0), 0.0);
@@ -81,7 +83,7 @@ void main()
 
   test("all rings iterrated", () {
     MapMock map = new MapMock();
-    Pathfinder pathfinder = new Pathfinder(map, 40.0, 9.0);
+    Pathfinder pathfinder = new Pathfinder(map, minAltitude: 40.0, glideAngle: 9.0);
 
     Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 500.0);
     Segment ringSegment = new Segment(new Position(1, 2), new Point(3.0, 5.0), new Point(5.0, 7.0), 500.0);
@@ -103,7 +105,7 @@ void main()
 
   test("itteration stopped if no segment changed", () {
     MapMock map = new MapMock();
-    Pathfinder pathfinder = new Pathfinder(map, 40.0, 9.0);
+    Pathfinder pathfinder = new Pathfinder(map, minAltitude: 40.0, glideAngle: 9.0);
 
     Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 0.0);
     Segment ringSegment = new Segment(new Position(1, 2), new Point(3.0, 5.0), new Point(5.0, 7.0), 0.0);
@@ -121,5 +123,41 @@ void main()
     pathfinder.process(500.0);
 
     expect(callCount, equals(4));
+  });
+
+  test("Snapshot service called if segment changed", () {
+    MapMock map = new MapMock();
+    SnapshotSubscriberMock snapshotSubscriber = new SnapshotSubscriberMock();
+    Pathfinder pathfinder = new Pathfinder(map, subscriber: snapshotSubscriber, minAltitude: 40.0, glideAngle: 9.0);
+
+    Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 0.0);
+    Segment ringSegment = new Segment(new Position(1, 2), new Point(3.0, 5.0), new Point(5.0, 7.0), 0.0);
+
+    when(map.ringCount).thenReturn(1);
+    when(map.getCenter()).thenReturn(center);
+    when(map.getCenterRing(1)).thenReturn([ringSegment]);
+    when(map.getNeighbours(ringSegment)).thenReturn([center]);
+
+    pathfinder.process(500.0);
+
+    expect(verify(snapshotSubscriber.onSegmentChanged(captureAny)).captured.single, ringSegment);
+  });
+
+  test("Snapshot service called before calcuation is started", () {
+    MapMock map = new MapMock();
+    SnapshotSubscriberMock snapshotSubscriber = new SnapshotSubscriberMock();
+    Pathfinder pathfinder = new Pathfinder(map, subscriber: snapshotSubscriber, minAltitude: 40.0, glideAngle: 9.0);
+
+    Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 0.0);
+    Segment ringSegment = new Segment(new Position(1, 2), new Point(3.0, 5.0), new Point(5.0, 7.0), 0.0);
+
+    when(map.ringCount).thenReturn(1);
+    when(map.getCenter()).thenReturn(center);
+    when(map.getCenterRing(1)).thenReturn([ringSegment]);
+    when(map.getNeighbours(ringSegment)).thenReturn([center]);
+
+    pathfinder.process(500.0);
+
+    expect(verify(snapshotSubscriber.onStarted(captureAny)).captured.single, map);
   });
 }
