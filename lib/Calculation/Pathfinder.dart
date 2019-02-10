@@ -58,8 +58,7 @@ class Pathfinder
         continue;
       }
 
-      double distance = segment.center.distanceTo(neighbour.center);
-      double altitude = neighbour.absoluteAltitude - (distance / glideAngle);
+      double altitude = _calculateAltitude(neighbour, segment);
       altitudes.add(altitude);
     }
 
@@ -73,6 +72,12 @@ class Pathfinder
     }
 
     return segmentChanged;
+  }
+
+  double _calculateAltitude(Segment start, Segment destination)
+  {
+    double distance = destination.center.distanceTo(start.center);
+    return start.absoluteAltitude - (distance / glideAngle);
   }
 
   void _snapshot(Segment segment)
