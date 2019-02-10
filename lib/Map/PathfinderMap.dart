@@ -90,6 +90,17 @@ class PathfinderMap
       list.add(_segments[x][y]);
     }
   }
+
+  List<Segment> get allSegments
+  {
+    List<Segment> allSegments = new List();
+
+    for (List<Segment> row in _segments) {
+      allSegments.addAll(row);
+    }
+
+    return allSegments;
+  }
 }
 
 class SemanticException implements Exception

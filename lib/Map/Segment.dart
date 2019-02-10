@@ -28,6 +28,24 @@ class Segment
     _absoluteAltitude = value;
   }
 
+  Segment clone()
+  {
+    Segment segment = new Segment(position, start, end, geoAltitude);
+    segment.absoluteAltitude = absoluteAltitude;
+
+    return segment;
+  }
+
+  Map toMap()
+  {
+    return {
+      'position': position.toMap(),
+      'start': {'x': start.x, 'y': start.y},
+      'end': {'x': end.x, 'y': end.y},
+      'geoAltitude': geoAltitude,
+      'absoluteAltitude': absoluteAltitude
+    };
+  }
 }
 
 class Position
@@ -36,4 +54,9 @@ class Position
   final int y;
 
   Position(this.x, this.y);
+
+  Map toMap()
+  {
+    return {'x': x, 'y': y};
+  }
 }
