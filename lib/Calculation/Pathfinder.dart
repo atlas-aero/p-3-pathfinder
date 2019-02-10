@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:p3pathfinder/Calculation/SnapshotSubscriber.dart';
 import 'package:p3pathfinder/Map/PathfinderMap.dart';
 import 'package:p3pathfinder/Map/Segment.dart';
@@ -49,19 +51,25 @@ class Pathfinder
     bool segmentChanged = false;
     List<Segment> neighbours = map.getNeighbours(segment);
 
+    List<double> altitudes = new List();
+
     for (Segment neighbour in neighbours) {
       if (neighbour.relativeAltitude < minAltitude) {
         continue;
       }
 
       double distance = segment.center.distanceTo(neighbour.center);
-      double newAbsAltitude = neighbour.absoluteAltitude - (distance / glideAngle);
+      double altitude = neighbour.absoluteAltitude - (distance / glideAngle);
+      altitudes.add(altitude);
+    }
 
-      if (newAbsAltitude > segment.absoluteAltitude) {
-        segment.absoluteAltitude = newAbsAltitude;
-        _snapshot(segment);
-        segmentChanged = true;
-      }
+    double maxAltitude = altitudes.isEmpty ? 0.0 : altitudes.reduce(max);
+
+    if (maxAltitude >= segment.geoAltitude
+        && maxAltitude > segment.absoluteAltitude) {
+      segment.absoluteAltitude = maxAltitude;
+      _snapshot(segment);
+      segmentChanged = true;
     }
 
     return segmentChanged;

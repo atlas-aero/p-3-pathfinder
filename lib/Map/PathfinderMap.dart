@@ -101,6 +101,8 @@ class PathfinderMap
 
     return allSegments;
   }
+
+  List<List<Segment>> get segments => _segments;
 }
 
 class SemanticException implements Exception

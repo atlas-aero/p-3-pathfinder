@@ -21,7 +21,7 @@ class Segment
   }
   
   double get size => end.x - start.x;
-  double get absoluteAltitude => _absoluteAltitude >= geoAltitude ? _absoluteAltitude : 0;
+  double get absoluteAltitude => _absoluteAltitude;
   double get relativeAltitude => _absoluteAltitude - geoAltitude;
 
   set absoluteAltitude(double value) {
