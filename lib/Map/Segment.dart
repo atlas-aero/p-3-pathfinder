@@ -8,6 +8,7 @@ class Segment
   final double geoAltitude;
 
   double _absoluteAltitude = 0;
+  bool _touched = false;
 
   Segment(this.position, this.start, this.end, this.geoAltitude);
 
@@ -23,9 +24,15 @@ class Segment
   double get size => end.x - start.x;
   double get absoluteAltitude => _absoluteAltitude;
   double get relativeAltitude => _absoluteAltitude - geoAltitude;
+  bool get isTouched => _touched;
 
   set absoluteAltitude(double value) {
     _absoluteAltitude = value;
+  }
+
+  void touch()
+  {
+    _touched = true;
   }
 
   Segment clone()
@@ -42,6 +49,7 @@ class Segment
       'position': position.toMap(),
       'start': {'x': start.x, 'y': start.y},
       'end': {'x': end.x, 'y': end.y},
+      'touched': _touched,
       'geoAltitude': geoAltitude,
       'absoluteAltitude': absoluteAltitude
     };

@@ -66,9 +66,15 @@ class Pathfinder
 
     if (maxAltitude >= segment.geoAltitude
         && maxAltitude > segment.absoluteAltitude) {
+      segment.touch();
       segment.absoluteAltitude = maxAltitude;
       _snapshot(segment);
       segmentChanged = true;
+    }
+
+    if (!segment.isTouched) {
+      segment.touch();
+      _snapshot(segment);
     }
 
     return segmentChanged;

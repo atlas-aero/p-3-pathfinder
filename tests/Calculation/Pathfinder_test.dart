@@ -63,6 +63,25 @@ void main()
     expect(ringSegment.absoluteAltitude, equals(0.0));
   });
 
+  test("touched and snapshotted, even if not updated", () {
+    MapMock map = new MapMock();
+    SnapshotSubscriberMock snapshotSubscriber = new SnapshotSubscriberMock();
+    Pathfinder pathfinder = new Pathfinder(map, subscriber: snapshotSubscriber, minAltitude: 40.0, glideAngle: 9.0);
+
+    Segment center = new Segment(new Position(2, 2), new Point(5.0, 5.0), new Point(7.0, 7.0), 470.0);
+    Segment ringSegment = new Segment(new Position(1, 2), new Point(3.0, 5.0), new Point(5.0, 7.0), 0.0);
+
+    when(map.ringCount).thenReturn(1);
+    when(map.getCenter()).thenReturn(center);
+    when(map.getCenterRing(1)).thenReturn([ringSegment]);
+    when(map.getNeighbours(ringSegment)).thenReturn([center]);
+
+    pathfinder.process(500.0);
+
+    expect(ringSegment.isTouched, equals(true));
+    expect(verify(snapshotSubscriber.onSegmentChanged(captureAny)).captured.single, ringSegment);
+  });
+
   test("alwas best path (highest abs altitude) choosen", () {
     MapMock map = new MapMock();
     Pathfinder pathfinder = new Pathfinder(map, minAltitude: 40.0, glideAngle: 9.0);
