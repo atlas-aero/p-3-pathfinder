@@ -39,6 +39,10 @@ class Segment
   {
     Segment segment = new Segment(position, start, end, geoAltitude);
     segment.absoluteAltitude = absoluteAltitude;
+    
+    if (_touched) {
+      segment.touch();
+    }
 
     return segment;
   }
